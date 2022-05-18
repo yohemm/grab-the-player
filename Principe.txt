@@ -1,0 +1,26 @@
+Multi 2d vue de haut
+Joueur:
+	deplacement	
+		vitesse du joueur moyennent rapide est progressive
+		direction donné avec l'axe x de la sourie(dégres)
+		z,q,s,d : devant , sur la gauche, arriére, droite
+		
+	un grappin qui permet si un autre joueur est toucher de l'attiré sur le joueur. Animation lente en punition si le 
+		jouer c'est louper. Utilise 50% de la bar d'énergie
+	un cut qui permet de faire 50% de dégats. Utilise 20% de la bar d'énergie
+	un dash utilise 20% de la bar d'énérgie est utilisable sur 8 direction (diagonal)
+	une bar d'énergie qui se régénaire trés rapidement a la condition que aucune action utilisant celle si soit 
+		faite pendant 2s
+
+Map:
+	plusieur régions, a chaque coin de map:
+		Glace, avec glisade (fun)
+		plaine, normal, présence d'object moyenne (débutant
+		désert, grand est assé vide (parfait pour 1vs1 classique)
+		ville, bcp d'object et des obstacles (batiment), (campeur/ multi en masse)
+Object: roche, buisso, blacon, arbre/
+	coordoné aléatoire, en fonction de la densité d'obj
+	Collision, Bool&1
+	position z, si z>ZPlayer le player peut se cacher dessus,
+	
+	
