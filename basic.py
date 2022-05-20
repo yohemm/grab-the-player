@@ -96,11 +96,13 @@ class Button():
     def click(self):
         return self.pos[0] < pygame.mouse.get_pos()[0] < self.pos[0] + self.size[0] and self.pos[1] < pygame.mouse.get_pos()[1] < self.pos[1] + self.size[1]
 class Menu():
-    def __init__(self, name ,listBtn, listText, listImg):
+    def __init__(self, name:str,listBtn:list=[], listText:list=[], listImg:list=[]):
         self.listBtn = listBtn
         self.listImg = listImg
         self.listText = listText
         self.name = name
+    def __repr__(self):
+        return self.name + ' : ' + str(self.listBtn) + ' : ' + str(self.listText) + ' : ' + str(self.listImg)
 
     def blit(self, screen):
         for btn in self.listBtn:

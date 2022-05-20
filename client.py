@@ -2,7 +2,7 @@ import pickle
 import socket
 import time
 
-host = '192.168.1.15'
+host = '192.168.1.34'
 firstport = 12345
 clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 

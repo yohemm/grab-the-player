@@ -1,9 +1,10 @@
 import pygame
 import math
+
 import basic
 
 class Player:
-    def __init__(self,ip:str, name='Player1', pos = [0,0], velocityMax = 5):
+    def __init__(self, name='Player1', pos = [0,0], velocityMax = 5):
         self.doDict = {
             'imobile' : 0,
             'move' : 1,
@@ -11,7 +12,6 @@ class Player:
             'cut' : 3,
             'dash' : 4
         }
-        self.ip = ip
         self.imageOrigin = pygame.transform.scale(pygame.image.load('src/player.png'), [100,100])
         self.image = self.imageOrigin
         self.name = name
@@ -22,14 +22,31 @@ class Player:
         self.direction = 'forward'
         self.healthMax = 100
         self.health = self.healthMax
-        self.touchInCut = []
         self.do = 'imobile'
         self.manaMax = 100
         self.mana = self.manaMax
         self.manaTimer = 0
         self.harpon = None
         self.cutImg = None
-        self.cutAnime = basic.Animation(7, 50,'src/cut/sprite_', '.png')
+        self.cutAnime = basic.Animation(nbImg=7, cooldown=50,dossier='src/cut/sprite_', sufix='.png')
+        self.touchInCut = []
+
+    def __repr__(self):
+        message = str(self.name) + ' : pos=' + str(self.pos) + ' ange=' + str(self.angle)
+        if self.velocity > 0:
+            message +=' vel=' + str(self.velocity) + ' dir=' + str(self.direction)
+        if not self.do == 'imobile':
+            message+= ' do '+ self.do
+        if not self.health == self.healthMax:
+            message +=' life=' + str(self.health)+'/' + str(self.healthMax)
+        if not self.mana == self.manaMax:
+            message +=' ener=' + str(self.mana)+'/' + str(self.manaMax)
+        if not self.harpon == None:
+            message += ' harpon : ' + str(self.harpon)
+        if not self.cutImg == None:
+            message += ' cut : ' + str(self.cutImg)
+
+        return message
 
     def returnStat(self):
         if type(self.harpon) == Harpon:
@@ -40,12 +57,18 @@ class Player:
             cutAnime = self.cutAnime.getStat()
         else:
             cutAnime = self.cutAnime
-
-        stats = [self.name, self.pos, self.angle, self.velocity, self.velocityMax, self.direction, self.healthMax, self.health, self.do, self.manaMax, self.mana, self.manaTimer, harpon, self.cutImg, cutAnime]
+        stats = [self.name, self.pos, self.angle, self.velocity, self.velocityMax, self.direction, self.healthMax, self.health, self.do, self.manaMax, self.mana, self.manaTimer, harpon, cutAnime]
         return stats
 
     def getMove(self):
         return self.angle, self.velocity, self.direction, self.do, self.mana
+
+    def setMove(self, list):
+        self.angle = list[0]
+        self.velocity = list[1]
+        self.direction = list[2]
+        self.do = list[3]
+        self.mana = list[4]
 
     def changeStat(self,list):
         self.name = list[0]
@@ -61,12 +84,15 @@ class Player:
         self.mana = list[10]
         self.manaTimer = list[11]
         if not list[12] == None:
+            self.createHarpon()
             if type(self.harpon) == Harpon:
                 self.harpon.setStat(list[12])
         if not list[13] == None:
-            if type(self.cutAnime) == basic.Animation:
-                self.harpon.setStat(list[13])
-        self.cutAnime = list[14]
+            if type(self.harpon) == basic.Animation:
+                self.cutAnime.setStat(12)
+
+    def getRect(self):
+        return (self.pos[0]- self.imageOrigin.get_size()[0]//2, self.pos[1] - self.imageOrigin.get_size()[1]//2, self.imageOrigin.get_size()[0], self.imageOrigin.get_size()[1])
 
     def changeAngle(self, angle):
         self.angle = angle%360
@@ -74,11 +100,11 @@ class Player:
     def blit(self, screen):
         self.image = pygame.transform.rotate(self.imageOrigin,self.angle)
         screen.blit(self.image, [self.pos[0] - int(self.image.get_size()[0]/2), self.pos[1] - int(self.image.get_size()[1]/2)])
-        if self.do == 'cut':
-            self.cutImg = self.blitObjForward(screen,pygame.image.load(self.cutAnime.dossier + str(self.cutAnime.idImg) + self.cutAnime.sufix))
+        if self.do == 'cut' and not self.cutImg == None:
+            screen.blit(self.cutImg, [self.pos[0] - self.imageOrigin.get_size()[0]//2 - math.cos(math.radians((self.angle + 270) % 360)) * 50,
+                 self.pos[1] - self.imageOrigin.get_size()[1]//2 + math.sin(math.radians((self.angle + 270) % 360)) * 50])
         else: self.cutImg = None
         if type(self.harpon) == Harpon:
-            print('chauve')
             self.harpon.blit(screen)
 
         #HEALTH BAR
@@ -95,17 +121,15 @@ class Player:
         if type(self.harpon) == Harpon and self.harpon.verifyEnd():
             self.harpon = None
 
-    def blitObjForward(self, screen, image):
-        rect2 = [self.pos[0] - math.cos(math.radians((self.angle + 270) % 360)) * 50,
-                 self.pos[1] + math.sin(math.radians((self.angle + 270) % 360)) * 50]
+    def CreateObjForward(self, image):
         newImg = pygame.transform.rotozoom(
             pygame.transform.scale(image, [100, image.get_height() * 100 / image.get_width()]), self.angle, 1)
         newImg.set_colorkey((0, 0, 0))
-        screen.blit(newImg, [rect2[0] - newImg.get_size()[0] // 2, rect2[1] - newImg.get_size()[1] // 2])
         return newImg
 
     def createHarpon(self):
         if not type(self.harpon) == Harpon:
+            print(self.mana)
             if  self.changeMana(-50):self.harpon = Harpon(self, 300)
 
 
@@ -132,12 +156,14 @@ class Player:
         if self.do == 'cut':
             if self.cutAnime.disable:
                 if not self.changeMana(-25): self.do = 'imobile'
-            for ennemi in allPlayer:
-                if pygame.rect.Rect([self.pos[0] - math.cos(math.radians((self.angle + 270) % 360)) * 50,
-                 self.pos[1] + math.sin(math.radians((self.angle + 270) % 360)) * 50], self.cutImg.get_size()).colliderect(pygame.rect.Rect(ennemi.pos, ennemi.image.get_size())) and not ennemi == self and not ennemi in self.touchInCut:
-                    self.touchInCut.append(ennemi)
-                    ennemi.health -= 50
-
+            else:
+                self.cutImg = self.CreateObjForward(pygame.image.load(
+                    self.cutAnime.dossier + str(self.cutAnime.idImg) + self.cutAnime.sufix))
+                for ennemi in allPlayer:
+                    if pygame.rect.Rect([self.pos[0] - self.imageOrigin.get_size()[0]//2 - math.cos(math.radians((self.angle + 270) % 360)) * 50,
+                 self.pos[1] - self.imageOrigin.get_size()[1]//2 + math.sin(math.radians((self.angle + 270) % 360)) * 50], self.cutImg.get_size()).colliderect(ennemi.getRect()) and not ennemi == self and not ennemi in self.touchInCut:
+                        self.touchInCut.append(ennemi)
+                        ennemi.health -= 50
             if not self.cutAnime.changeImage():
                 self.do = 'imobile'
                 self.touchInCut = []
@@ -187,11 +213,15 @@ class Harpon:
         self.target = None
 
     def __repr__(self):
-        return self.getStat()
+        if self.moveForward:
+            message = 'goings on '
+        else:message = 'commings on '
+        message += 'angle='+str(self.angle) +' pos='+str(self.pos) + ' distanceMax='+str(self.distance) + ' velocity='+str(self.velocity)
+        return message
 
     def getStat(self):
         if type(self.target) == Player:
-            target = self.target.ip
+            target = self.target.pos
         else:
             target = self.target
         return [self.moveForward, self.angle, self.endPos, self.pos, self.midlePos, self.chainList, self.distance, self.velocity, target]
@@ -221,6 +251,7 @@ class Harpon:
             self.pos =[self.pos[0] - math.cos(math.radians((self.angle + 90) % 360)) * self.velocity,
                      self.pos[1] + math.sin(math.radians((self.angle + 90) % 360)) * self.velocity]
             if not self.target == None:
+                print('INCROYABLE')
                 self.target.do = 'imobile'
                 self.target.pos =[self.target.pos[0] - math.cos(math.radians((self.angle + 90) % 360)) * (self.velocity + 1),
                      self.target.pos[1] + math.sin(math.radians((self.angle + 90) % 360)) * (self.velocity + 1)]
