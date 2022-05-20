@@ -1,10 +1,9 @@
 import pygame
 import math
 import basic
-import clientUDP
 
 class Player:
-    def __init__(self,name='Player1', pos = [0,0], velocityMax = 5):
+    def __init__(self,ip:str, name='Player1', pos = [0,0], velocityMax = 5):
         self.doDict = {
             'imobile' : 0,
             'move' : 1,
@@ -12,17 +11,18 @@ class Player:
             'cut' : 3,
             'dash' : 4
         }
+        self.ip = ip
         self.imageOrigin = pygame.transform.scale(pygame.image.load('src/player.png'), [100,100])
         self.image = self.imageOrigin
         self.name = name
         self.pos = pos
         self.angle = 0
+        self.velocityMax = velocityMax
         self.velocity = 0
         self.direction = 'forward'
         self.healthMax = 100
         self.health = self.healthMax
         self.touchInCut = []
-        self.velocityMax = velocityMax
         self.do = 'imobile'
         self.manaMax = 100
         self.mana = self.manaMax
@@ -32,8 +32,41 @@ class Player:
         self.cutAnime = basic.Animation(7, 50,'src/cut/sprite_', '.png')
 
     def returnStat(self):
-        stats = [self.name, self.pos, self.angle, self.velocity, self.direction, self.healthMax, self.health, self.mana ]
+        if type(self.harpon) == Harpon:
+            harpon = self.harpon.getStat()
+        else:
+            harpon = self.harpon
+        if type(self.cutAnime) == basic.Animation:
+            cutAnime = self.cutAnime.getStat()
+        else:
+            cutAnime = self.cutAnime
+
+        stats = [self.name, self.pos, self.angle, self.velocity, self.velocityMax, self.direction, self.healthMax, self.health, self.do, self.manaMax, self.mana, self.manaTimer, harpon, self.cutImg, cutAnime]
         return stats
+
+    def getMove(self):
+        return self.angle, self.velocity, self.direction, self.do, self.mana
+
+    def changeStat(self,list):
+        self.name = list[0]
+        self.pos = list[1]
+        self.angle = list[2]
+        self.velocity = list[3]
+        self.velocityMax = list[4]
+        self.direction = list[5]
+        self.healthMax = list[6]
+        self.health = list[7]
+        self.do = list[8]
+        self.manaMax = list[9]
+        self.mana = list[10]
+        self.manaTimer = list[11]
+        if not list[12] == None:
+            if type(self.harpon) == Harpon:
+                self.harpon.setStat(list[12])
+        if not list[13] == None:
+            if type(self.cutAnime) == basic.Animation:
+                self.harpon.setStat(list[13])
+        self.cutAnime = list[14]
 
     def changeAngle(self, angle):
         self.angle = angle%360
@@ -45,6 +78,7 @@ class Player:
             self.cutImg = self.blitObjForward(screen,pygame.image.load(self.cutAnime.dossier + str(self.cutAnime.idImg) + self.cutAnime.sufix))
         else: self.cutImg = None
         if type(self.harpon) == Harpon:
+            print('chauve')
             self.harpon.blit(screen)
 
         #HEALTH BAR
@@ -152,6 +186,26 @@ class Harpon:
         self.velocity = self.velocityMin
         self.target = None
 
+    def __repr__(self):
+        return self.getStat()
+
+    def getStat(self):
+        if type(self.target) == Player:
+            target = self.target.ip
+        else:
+            target = self.target
+        return [self.moveForward, self.angle, self.endPos, self.pos, self.midlePos, self.chainList, self.distance, self.velocity, target]
+
+    def setStat(self, list):
+        self.moveForward = list[0]
+        self.angle = list[1]
+        self.endPos = list[2]
+        self.pos = list[3]
+        self.midlePos = list[4]
+        self.chainList = list[5]
+        self.distance = list[6]
+        self.velocity = list[7]
+
     def move(self, allplayer):
         k = 1.1
         if self.moveForward:
@@ -185,7 +239,7 @@ class Harpon:
 
 
     def blit(self, screen):
-        self.grab = pygame.transform.rotate(self.grabOrigin, self.angle)
         screen.blit(self.grab, [self.pos[0] - self.grab.get_size()[0]//2, self.pos[1] - self.grab.get_size()[1]//2])
+        self.grab = pygame.transform.rotate(self.grabOrigin, self.angle)
 
 

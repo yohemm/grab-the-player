@@ -10,6 +10,21 @@ class Animation():
         self.timer = 0
         self.cooldown = cooldown
 
+    def __repr__(self):
+        return self.getStat()
+    def getStat(self):
+        return [self.nbImg, self.dossier, self.sufix, self.idImg, self.disable, self.timer, self.cooldown]
+
+    def setStat(self, list):
+        self.nbImg = list[0]
+        self.dossier = list[1]
+        self.sufix = list[2]
+        self.idImg = list[3]
+        self.disable = list[4]
+        self.timer = list[5]
+        self.cooldown = list[6]
+
+
     def changeImage(self):
         if self.disable:
             self.timer = pygame.time.get_ticks()

@@ -3,7 +3,7 @@ import basic
 import player
 import pygame
 import random
-import clientUDP
+import client
 
 class Main:
     def __init__(self, screenSize):
@@ -58,17 +58,22 @@ class Main:
         pygame.display.set_caption('GarbThePlayer')
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(screenSize)
-        self.character = player.Player(pos= [400,400])
-        self.playerList = [self.character, player.Player(pos= [100,100])]
+        ip = client.sendAndRecp({'connection' : None})
+        self.character = player.Player(ip, pos= [400,400])
+        self.playerList = [self.character]
         self.MoussePosGame = [self.screen.get_size()[0]//2, self.screen.get_size()[1]//2]
         pygame.mouse.set_pos(self.MoussePosGame)
         self.mousseSensitivity = 0.5
         self.menu = 'pause'
         self.inGame = True
+        self.toSend = {}
 
 
     def mainLoop(self):
         while True:
+            if not self.playerList[0].harpon == None:
+                print(self.playerList[0].harpon.moveForward)
+            self.toSend = {}
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -84,7 +89,6 @@ class Main:
                             if not self.character.do in ['cut', 'grab']:
                                 self.character.do = 'cut'
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    print(pygame.MOUSEBUTTONDOWN)
                     pygame.mouse.get_pressed()[0]
                     if self.menu == '':
                         if not self.character.do in ['cut', 'grab']:
@@ -93,8 +97,7 @@ class Main:
                                 self.character.createHarpon()
                             elif pygame.mouse.get_pressed()[2]:
                                 self.character.do = 'cut'
-            if self.inGame:
-                clientUDP.send(self.character.returnStat())
+
             self.blitSys()
             inMenu = False
             for menu in self.menuList:
@@ -104,13 +107,24 @@ class Main:
                     pygame.mouse.set_visible(True)
             if not inMenu:
                 self.gameLoop()
+            if self.inGame:
+                self.character.returnStat()
+                self.toSend['player'] = self.character.returnStat()
+                result = client.sendAndRecp(self.toSend)
+                if type(result) == dict:
+                    self.playerList = []
+                    for ip, playerstat in result.items():
+                        ennemi = player.Player(ip)
+                        ennemi.changeStat(playerstat['player'])
+                        self.playerList.append(ennemi)
+                if self.character.do == 'grab':
+                    print(result)
+
             self.clock.tick(60)
             pygame.display.update()
             self.screen.fill((40, 40, 40))
 
     def gameLoop(self):
-        if len(self.playerList) < 2:
-            self.playerList.append(player.Player(pos= [random.randint(0,self.screen.get_size()[0]), random.randint(0,self.screen.get_size()[1])]))
         for playerInGame in self.playerList:
             if playerInGame.health <= 0:
                 self.playerList.remove(playerInGame)

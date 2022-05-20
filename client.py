@@ -1,26 +1,27 @@
-from threading import Thread
+import pickle
 import socket
+import time
 
-def send(client):
-    while True:
-        msg = input('->').encode('utf-8')
-        socket.send(msg)
-def reception(client):
-    while True:
-        requete_serveur = socket.recv(500).decode ('utf-8')
-        print(requete_serveur)
+host = '192.168.1.15'
+firstport = 12345
+clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-HOST = '192.168.1.15'
-PORT = 6390
+clientSock.settimeout(1)
 
-# Cretaion du socket
+def sendAndRecp(message):
+    start = time.time()
+    clientSock.connect_ex((host, firstport))
+    clientSock.sendto(pickle.dumps(message), (host, firstport))
+    try:
+        data, serveur = clientSock.recvfrom(2048)
+        dataUncode = pickle.loads(data)
+        elapsed = time.time() - start
 
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if __name__ == '__main__':
+            print('serveur says:' + str(dataUncode) + ' in ' + str(elapsed) + 'ms')
+        return dataUncode
+    except TimeoutError:
+        print('REQUEST TIMED OUT')
 
-socket.connect((HOST,PORT))
-
-envoi = Thread(target=send, args={socket})
-recep = Thread(target=reception, args={socket})
-
-envoi.start()
-recep.start()
+if __name__ == '__main__':
+    sendAndRecp([4,9,12])
