@@ -2,7 +2,7 @@ import pickle
 import socket
 import player
 
-host = '192.168.1.34'
+host = '172.20.10.11'
 firstport = 12345
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -25,8 +25,11 @@ while True:
     message = {}
     data, addr = sock.recvfrom(2048)
     data = pickle.loads(data)
-    print(data)
+    print(playerDict)
     if type(data) == dict:
+        if 'disconnection' in data.keys():
+            del playerDict[addr[0]]
+            message = {'disconnection' : True}
         if 'connection' in data.keys():
             rooms[0].append(addr)
             playerDict[addr[0]] = player.Player(data['connection'][0])
@@ -37,13 +40,10 @@ while True:
             if playerDict[addr[0]].do == 'grab':
                 if playerDict[addr[0]].harpon == None:
                     playerDict[addr[0]].createHarpon()
-                print(playerDict[addr[0]].harpon)
-            print('et oe')
             message['playerList'] = getPlayerStatList(addr[0])
             message['character'] = playerDict[addr[0]].returnStat()
     else:
         message = "HARRA"
-
     print(message)
     sock.sendto(pickle.dumps(message), addr)
 

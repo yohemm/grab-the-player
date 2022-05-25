@@ -60,19 +60,22 @@ class Main:
         pygame.display.set_caption('GarbThePlayer')
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(screenSize)
-        name = 'Owner'
-        pos =[400,400]
-        self.character = player.Player(name,  pos= pos)
-        result = client.sendAndRecp({'connection' : [self.character.name]})
-        self.character.changeStat(result['character'])
+        self.player = None
         self.playerList = []
-        self.updatePlayerList(result['playerList'])
         self.MoussePosGame = [self.screen.get_size()[0]//2, self.screen.get_size()[1]//2]
         pygame.mouse.set_pos(self.MoussePosGame)
         self.mousseSensitivity = 0.5
-        self.menu = ''
+        self.menu = 'welcom'
         self.inGame = True
         self.toSend = {}
+        self.map = {}
+        self.objs = {
+            -1: [],
+            0: [],
+            1: [],
+            2: [],
+
+        }
 
     def updatePlayerList(self, playerStatList):
         while not len(playerStatList) == len(self.playerList):
@@ -101,6 +104,10 @@ class Main:
             self.menu = newMenu
 
 
+    def disconnection(self):
+        client.sendAndRecp({'disconnection': None})
+        self.inGame = False
+        self.changeMenu('welcom')
 
     def mainLoop(self):
         while True:
@@ -138,10 +145,15 @@ class Main:
                             if menu.listBtn[0].click():
                                 self.changeMenu('')
                             if menu.listBtn[1].click():
-                                self.changeMenu('welcom')
+                                self.disconnection()
                     elif self.menu == 'welcom':
                         if pygame.mouse.get_pressed()[0]:
                             if menu.listBtn[0].click():
+                                name = 'Owner'
+                                self.character = player.Player(name)
+                                result = client.sendAndRecp({'connection': [self.character.name]})
+                                self.character.changeStat(result['character'])
+                                self.updatePlayerList(result['playerList'])
                                 self.changeMenu('')
 
             if not('welcom' in self.menuPath or 'welcom' in self.menu):
@@ -166,11 +178,15 @@ class Main:
         direction = 'imobile'
         if self.menu == '':
             pygame.mouse.set_visible(0)
-            if not pygame.mouse.get_pos()[0] == self.MoussePosGame[0] and not self.character.do == 'cut':
+            if not pygame.mouse.get_pos()[0] == self.MoussePosGame[0] and not self.character.do == 'cut' and not self.character.do == 'grab':
                 self.character.changeAngle(
                     self.character.angle + (
                             self.MoussePosGame[0] - pygame.mouse.get_pos()[0]) * self.mousseSensitivity)
+                self.character.changeAngle(
+                    self.character.angle + (
+                            self.MoussePosGame[1] - pygame.mouse.get_pos()[1]) * self.mousseSensitivity)
             pygame.mouse.set_pos(self.MoussePosGame)
+            if self.character.health <=0 : self.disconnection()
             if not self.character.do == 'cut' and not self.character.do == 'grab':
                 if pygame.key.get_pressed()[pygame.key.key_code('z')]:
                     direction = 'forward'
@@ -189,7 +205,10 @@ class Main:
         self.character.move(self.playerList, direction)
 
     def blitSys(self):
-        for player in self.playerList:
-            player.blit(self.screen)
-        pygame.draw.rect(self.screen, (255,255,255), self.character.getRect())
+        for z in self.objs.keys():
+            for obj in self.objs[z]:
+                obj.blit()
+            if z == 0:
+                for player in self.playerList:
+                    player.blit(self.screen)
         self.character.blit(self.screen)

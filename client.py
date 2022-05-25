@@ -2,7 +2,7 @@ import pickle
 import socket
 import time
 
-host = '192.168.1.34'
+host = '172.20.10.11'
 firstport = 12345
 clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -16,6 +16,7 @@ def sendAndRecp(message):
         data, serveur = clientSock.recvfrom(2048)
         dataUncode = pickle.loads(data)
         elapsed = time.time() - start
+
 
         if __name__ == '__main__':
             print('serveur says:' + str(dataUncode) + ' in ' + str(elapsed) + 'ms')

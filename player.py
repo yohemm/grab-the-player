@@ -57,7 +57,7 @@ class Player:
             cutAnime = self.cutAnime.getStat()
         else:
             cutAnime = self.cutAnime
-        stats = [self.name, self.pos, self.angle, self.velocity, self.velocityMax, self.direction, self.healthMax, self.health, self.do, self.manaMax, self.mana, self.manaTimer, harpon, cutAnime]
+        stats = [self.name, self.pos, self.angle, self.velocity, self.velocityMax, self.direction, self.healthMax, self.health, self.do, self.manaMax, self.mana, harpon, cutAnime]
         return stats
 
     def getMove(self):
@@ -82,12 +82,11 @@ class Player:
         self.do = list[8]
         self.manaMax = list[9]
         self.mana = list[10]
-        self.manaTimer = list[11]
-        if not list[12] == None:
+        if not list[11] == None:
             self.createHarpon()
             if type(self.harpon) == Harpon:
-                self.harpon.setStat(list[12])
-        if not list[13] == None:
+                self.harpon.setStat(list[11])
+        if not list[12] == None:
             if type(self.harpon) == basic.Animation:
                 self.cutAnime.setStat(12)
 
@@ -129,7 +128,6 @@ class Player:
 
     def createHarpon(self):
         if not type(self.harpon) == Harpon:
-            print(self.mana)
             if  self.changeMana(-50):self.harpon = Harpon(self, 300)
 
 
@@ -220,13 +218,10 @@ class Harpon:
         return message
 
     def getStat(self):
-        if type(self.target) == Player:
-            target = self.target.pos
-        else:
-            target = self.target
-        return [self.moveForward, self.angle, self.endPos, self.pos, self.midlePos, self.chainList, self.distance, self.velocity, target]
+        return [self.moveForward, self.angle, self.endPos, self.pos, self.midlePos, self.chainList, self.distance, self.velocity]
 
     def setStat(self, list):
+        print(list)
         self.moveForward = list[0]
         self.angle = list[1]
         self.endPos = list[2]
@@ -272,5 +267,10 @@ class Harpon:
     def blit(self, screen):
         screen.blit(self.grab, [self.pos[0] - self.grab.get_size()[0]//2, self.pos[1] - self.grab.get_size()[1]//2])
         self.grab = pygame.transform.rotate(self.grabOrigin, self.angle)
-
-
+        distance = [self.endPos[0] - self.pos[0],self.endPos[1] - self.pos[1]]
+        pos = [self.endPos[0] - math.cos(math.radians((self.angle + 90) % 360)) * self.chain.get_size()[0],
+                     self.endPos[1] + math.sin(math.radians((self.angle + 90) % 360)) * self.chain.get_size()[1]]
+        for i in range(int(math.cos((self.angle + 90) % 360)* distance[0] + math.sin((self.angle + 90) % 360)* distance[1]//self.chain.get_size()[0])):
+            screen.blit(pygame.transform.rotate(self.chain, self.angle), self.pos)
+            pos = [pos[0] - math.cos(math.radians((self.angle + 90) % 360)) * self.chain.get_size()[0],
+                     pos[1] + math.sin(math.radians((self.angle + 90) % 360)) * self.chain.get_size()[1]]
