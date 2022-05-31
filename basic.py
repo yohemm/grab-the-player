@@ -1,3 +1,5 @@
+from math import sin, cos
+
 import pygame
 pygame.init()
 class Animation():
@@ -95,6 +97,7 @@ class Button():
 
     def click(self):
         return self.pos[0] < pygame.mouse.get_pos()[0] < self.pos[0] + self.size[0] and self.pos[1] < pygame.mouse.get_pos()[1] < self.pos[1] + self.size[1]
+
 class Menu():
     def __init__(self, name:str,listBtn:list=[], listText:list=[], listImg:list=[]):
         self.listBtn = listBtn
@@ -112,3 +115,112 @@ class Menu():
         for img in self.listImg:
             img.blit(screen)
 
+# Modeled after the parabola y = x^2
+def QuadraticEaseIn(p):
+    return p * p
+
+
+# Modeled after the parabola y = -x^2 + 2x
+def QuadraticEaseOut(p):
+    return -(p * (p - 2))
+
+
+# Modeled after the piecewise quadratic
+# y = (1/2)((2x)^2)             ; [0, 0.5)
+# y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
+def QuadraticEaseInOut(p):
+    if (p < 0.5):
+        return 2 * p * p
+    return (-2 * p * p) + (4 * p) - 1
+
+def EaseInOutQuart(inputvalue,outputmin,outputmax,inputmax):
+    inputmax /= inputmax * 0.5
+
+    if inputmax < 1:
+        return outputmax * 0.5 * inputvalue**4 + outputmin
+    return outputmax * -0.5 * ((inputvalue - 2)**4 - 2) + outputmin
+
+
+# Modeled after the cubic y = x^3
+def CubicEaseIn(p):
+    return p * p * p
+
+
+# Modeled after the cubic y = (x - 1)^3 + 1
+def CubicEaseOut(p):
+    f = (p - 1)
+    return f * f * f + 1
+
+
+# Modeled after the piecewise cubic
+# y = (1/2)((2x)^3)       ; [0, 0.5)
+# y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
+def CubicEaseInOut(p):
+    if (p < 0.5):
+        return 4 * p * p * p
+    else:
+        f = ((2 * p) - 2)
+        return 0.5 * f * f * f + 1
+
+
+# Modeled after the quartic x^4
+def QuarticEaseIn(p):
+    return p * p * p * p
+
+
+# Modeled after the quartic y = 1 - (x - 1)^4
+def QuarticEaseOut(p):
+    f = (p - 1)
+    return f * f * f * (1 - p) + 1
+
+
+# Modeled after the piecewise quartic
+# y = (1/2)((2x)^4)        ; [0, 0.5)
+# y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
+def QuarticEaseInOut(p):
+    if (p < 0.5):
+        return 8 * p * p * p * p
+    else:
+        f = (p - 1)
+        return -8 * f * f * f * f + 1
+
+
+# Modeled after the quintic y = x^5
+def QuinticEaseIn(p):
+    return p * p * p * p * p
+
+
+# Modeled after the quintic y = (x - 1)^5 + 1
+def QuinticEaseOut(p):
+    f = (p - 1)
+    return f * f * f * f * f + 1
+
+
+# Modeled after the piecewise quintic
+# y = (1/2)((2x)^5)       ; [0, 0.5)
+# y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
+def QuinticEaseInOut(p):
+    if (p < 0.5):
+        return 16 * p * p * p * p * p
+    else:
+        f = ((2 * p) - 2)
+        return 0.5 * f * f * f * f * f + 1
+
+
+def easeIn(inVal, inMax, outMin, outMax):
+    return outMax * math.sin(inVal / inMax * (pi / 2)) + outMin;
+
+
+# Modeled after quarter-cycle of sine wave
+def SineEaseIn(p):
+    return sin((p - 1) * M_PI_2) + 1
+
+
+# Modeled after quarter-cycle of sine wave (different phase)
+def SineEaseOut(p):
+    return sin(p * M_PI_2)
+
+
+# Modeled after half sine wave
+def SineEaseInOut(p):
+    return 0.5 * (1 - cos(p * M_PI))
