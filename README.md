@@ -3,15 +3,9 @@ A 2D online video game with server and client.
 
 ## Getting Started
 
-You need to have install Python.
-
 ### Prerequisites
 
-List any software or tools that are required to be installed before running the project.
-
-- Python: pickle
-- Python: pygame
-- Python: socket
+- Python
 
 ### Installation
 
