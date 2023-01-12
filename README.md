@@ -1,31 +1,41 @@
-
 # GrabThePlayer
+A 2D online video game with server and client.
 
-Jeu 2d Python pvp multi-joueur sur serveur.
+## Getting Started
 
----
-## Explication
-    Projet personnelle, jeux 2d vue du dessus avec un systeme d'orientation du personnage et de grappin pour attiré les ennemis a sois et pouvoir utiliser son couteau
----
-## Outils
-    - Pygame
-    - Pickle
----
-## Installation
-    Python et un connection internet est requis. 
-    installer pygame et pickle, Ouvrez votre cmd et écrivez:
-    - pip install pickle
-    - pip install pygame
-    - pip install socket
----
-## Configuration du serveur
-    Du point de vue du serveur:
-        Editer serveur.py et remplacer l'ip visible par votre IPV4
-    Du point de vue du joueur:
-        Editer client.py et remplacer l'ip par l'ip du serveur configurer au préalable.
+You need to have install Python.
 
----
-## Support
+### Prerequisites
 
-For support, email bloodoffairy@gmail.com .
+List any software or tools that are required to be installed before running the project.
 
+- Python: pickle
+- Python: pygame
+- Python: socket
+
+### Installation
+
+1. Clone the repository
+```git
+git clone https://github.com/yohemm/grab-the-player.git
+```
+
+2. Install dependencies
+```npm
+pip install pickle
+pip install pygame
+pip install socket
+```
+
+## Usage
+
+1. Set server
+Change the serveur ip with the computer's IPV4.
+1. Set Client
+Change the client ip with the same ip of server.
+2. Run Server and client
+Oppen Server, then oppen client for all user.
+
+## Authors
+
+* **Yohem** - *Initial work* - [Your GitHub username](https://github.com/yohemm)
