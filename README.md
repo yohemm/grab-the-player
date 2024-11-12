@@ -1,6 +1,10 @@
 # GrabThePlayer
 A 2D online video game with server and client.
 
+A Top view Shooting game with mousse orientation systeme.
+
+2 Types of attack, grap to attract ennemies and sword to inflict somes damages
+
 ## Getting Started
 
 ### Prerequisites
