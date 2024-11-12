@@ -64,8 +64,10 @@ Highlight the main features or functionalities of the project. Consider includin
 
 ## Technologies Used
 List the technologies, frameworks, or libraries used in this project.
-- [Node.js](https://nodejs.org/)
-- [Node.js](https://nodejs.org/)
+- [Python](https://www.python.org/)
+- [Pygame](https://www.pygame.org/)
+- [Pickle](https://docs.python.org/3/library/pickle.html)
+- [Socket](https://docs.python.org/3/library/socket.html)
 
 ---
 
