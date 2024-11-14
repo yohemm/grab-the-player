@@ -2,6 +2,12 @@
 # Grab The Player
 
 <!-- ![Project Banner](path/to/banner/image)  -->
+## 🌟 Project Status
+
+> **Current Status**: **:white_circle: In Beta**  
+> The project is a Beta/Demo of python game socket. 
+
+---
 
 ## Overview
 A 2D online video game with server and client.
