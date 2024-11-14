@@ -4,7 +4,8 @@
 <!-- ![Project Banner](path/to/banner/image)  -->
 ## 🌟 Project Status
 
-> **Current Status**: **:white_circle: In Beta**  
+> **Current Status**: **:white_circle: In Beta**
+> 
 > The project is a Beta/Demo of python game socket. 
 
 ---
